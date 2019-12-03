@@ -1,0 +1,12 @@
+*~
+*/*~
+*/*.pyc
+*/__pycache__/
+*.log
+outputs
+macros
+include
+docs
+data
+.DS_Store
+README_example
