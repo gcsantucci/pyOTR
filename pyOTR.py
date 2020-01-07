@@ -24,18 +24,18 @@ if __name__ == "__main__":
     #Configure the OTR System:
     log.Log('\nSetting OTR Configuration:', True)
 
-    #Set the Beam Properties:   
+    #Set the Beam Properties:
     beam = config.beam
     log.Log('Beam at {0} {1}'.format(beam['x'], beam['y']))
 
-    #Set the Light Properties:          
+    #Set the Light Properties:
     light = config.light_source
     log.Log('Light Source: {0} = {1}'.format(light, config.light[light]) )
 
-    #Set the OTR Foil in the Foil Disk:                          
+    #Set the OTR Foil in the Foil Disk:
     foil = Foil.Foil(ID=config.foil['ID'], normal=config.foil['normal'], diam=config.foil['diam'])
     log.Log('Foil ID: {0} = {1}'.format(foil.GetID(), foil.GetType()))
-    calib = Foil.CalibrationFoil(normal=config.foil['normal'], diam=config.foil['diam'])    
+    calib = Foil.CalibrationFoil(normal=config.foil['normal'], diam=config.foil['diam'])
 
     nrays = 100000
     nbins = 45
@@ -45,7 +45,7 @@ if __name__ == "__main__":
     rays = []
     vs = []
     rays_through = []
-    for i in range(nrays):
+    for i in range(nrays):        
         #x = np.random.normal(0., 3.)
         #y = np.random.normal(0., 3.)
         x = xmax*np.random.uniform(-1., 1.)
@@ -62,7 +62,7 @@ if __name__ == "__main__":
     vs = np.array(vs)
     #rays_through = np.array(rays_through)
 
-    print('time for {}: {:.2f} s'.format(nrays, time.time() - t0))
+    print('time for {0} rays: {1:.2f} s'.format(nrays, time.time() - t0))
 
     from ROOT import TCanvas, TH2F, gStyle
     img = TH2F('img', '', nbins, xmin, xmax, nbins, xmin, xmax)
@@ -70,7 +70,7 @@ if __name__ == "__main__":
     img3 = TH2F('img3', '', nbins, xmin, xmax, nbins, xmin, xmax)
     for iray, iv in zip(rays, vs):
         img.Fill(iray[0], iray[1])
-        if iv[2] > 0: img2.Fill(iray[0], iray[1]) 
+        if iv[2] > 0: img2.Fill(iray[0], iray[1])
         else: img3.Fill(iray[0], iray[1])
     #for iray in rays_through: img3.Fill(iray[0], iray[1])
     c0 = TCanvas('c1', 'c1', 700, 800)
@@ -83,15 +83,15 @@ if __name__ == "__main__":
     c0.SaveAs('img3.png')
 
     '''
-    start_time = time.time()     
-    queue = mp.Queue() 
+    start_time = time.time()
+    queue = mp.Queue()
     #procs = [mp.Process(target=GetRay, args=(queue, beam, light, otr_components,)) for x in xrange(nrays)]
     procs = [mp.Process(target=GetRay, args=(queue, calib)) for x in range(nrays)]
-    for p in procs: p.start()                                             
-    for p in procs: p.join()                                                                          
-    rays = np.array([queue.get() for p in procs]) 
+    for p in procs: p.start()
+    for p in procs: p.join()
+    rays = np.array([queue.get() for p in procs])
     print('parallel time for {}: {:.2f} s'.format(nrays, time.time() - start_time))
-    
+
     img = TH2F('img3', '', 30, -15., 15, 30, -15., 15.)
     img2 = TH2F('img4', '', 30, -15., 15, 30, -15., 15.)
     for iray in rays:
@@ -117,12 +117,12 @@ if __name__ == "__main__":
                            fdist=config.camera['focal distance'])
     cam_message = 'Camera size: {0} pixels at {1} cm from mirror.'
     log.Log(cam_message.format(camera.GetPixels(), camera.GetDistance()))
-    
+
     #Add all the components to pass to the main function
     log.Log('\nPreparing OTR components.')
     otr_components = [foil, mirrors, camera]
 
-    otr_components = [foil] 
+    otr_components = [foil]
 
     #Run the main function called 'GetRay' for each light ray.
     log.Log('\nUsing {0} CPUs to parallelize ray tracing.'.format(nCPUs), True)

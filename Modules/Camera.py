@@ -10,10 +10,10 @@ class Camera:
       def SetPixels(self, npxlX, npxlY):
           self.npxlX = npxlX
           self.npxlY = npxlY
-      
+
       def SetDistance(self, dist):
             self.fdist = dist
-          
+
       def GetPixels(self):
           return self.npxlX, self.npxlY
 
