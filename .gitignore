@@ -12,3 +12,7 @@ docs
 data
 .DS_Store
 README_example
+
+pyOTR_vec.py
+Modules/Foil_vec.py
+Modules/CoordTrans_vec.py
