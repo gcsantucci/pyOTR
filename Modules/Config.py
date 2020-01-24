@@ -1,13 +1,17 @@
 import logging
 import datetime
+import time
 import numpy as np
 
-VERBOSE = 0  # Set to 1 for debugging info.
+VERBOSE = 1  # Set to 1 for debugging info
 
-logfile = 'otr_sim.log'
+name = 'output/test'  # name prefix used to create all outputs
+logfile = name + '.log'  # log output will be directed to this file and to screen
 
 nrays = 100_000
 xmax = 25.
+
+make_plots = False
 
 beam = {
     'x': 0.,
@@ -75,5 +79,26 @@ file_handler = logging.FileHandler(logfile)
 logger.addHandler(file_handler)
 logger.addHandler(stream_handler)
 
-logger.info(datetime.time())
-logger.info('Starting pyOTR!')
+
+def GetTime(start=True):
+    now = datetime.datetime.now()
+    now = now.strftime('%Y, %b %d %H:%M:%S')
+    if start:
+        message = f'{now}\nStarting pyOTR:'
+    else:
+        message = f'Ending pyOTR, bye!!\n{now}'
+    logger.info(message)
+
+
+GetTime()
+# Decorator to measure the time each function takes to run:
+
+
+def timer(func):
+    def wrapper(*args, **kwargs):
+        t0 = time.time()
+        result = func(*args, **kwargs)
+        dt = time.time() - t0
+        logger.info(f'{func.__name__} ran in {dt:.2f} s')
+        return result
+    return wrapper
