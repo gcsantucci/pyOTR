@@ -10,10 +10,9 @@
 *.txt
 *.png
 
-outputs/
+output/
 macros/
 include/
 docs/
-data/
 README_example
 

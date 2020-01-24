@@ -14,7 +14,9 @@ def PrepareData(X, V):
     chunck = 1_000
     n = X.shape[0] // chunck
     r = X.shape[0] % chunck
-    cf.logger.info(f'Dividing the data into {n+1} chuncks')
+
+    nchuncks = n if r == 0 else n + 1
+    cf.logger.info(f'Dividing the data into {nchuncks} chuncks')
 
     Xc, Vc = [], []
     for i in range(n):
@@ -51,7 +53,7 @@ def TransportRays():
     np.save(f'{cf.name}_Vinitial', V)
     rays = Rays.Rays(X=X, V=V)
     X, V = PrepareData(X, V)
-    calib = Foil.CalibrationFoil(normal=np.array([[0, 1, 0]]), diam=50.)
+    calib = Foil.CalibrationFoil(normal=cf.foil['normal'], diam=cf.foil['diam'])
 
     with concurrent.futures.ProcessPoolExecutor() as executor:
         results = executor.map(calib.RaysTransport, X, V)
@@ -75,6 +77,8 @@ def TransportRays():
 
 if __name__ == '__main__':
 
+    cf.GetTime(start=True)
+
     TransportRays()
 
-    cf.GetTime(False)
+    cf.GetTime(start=False)

@@ -1,6 +1,4 @@
-import time
 import numpy as np
-import pickle
 import CoordTrans
 
 foils = {
@@ -41,16 +39,16 @@ class Foil:
         GoodRays = np.logical_and(AtPlane, HasV)
         y = y[GoodRays]
         Vy = Vy[GoodRays]
-        X = X.T[GoodRays] 
+        X = X.T[GoodRays]
         V = V.T[GoodRays]
         # Only keep rays that are pointing at the foil:
         ToPlane = Vy / np.abs(Vy) != (y - Y) / np.abs(y - Y)
         y = y[ToPlane]
         Vy = Vy[ToPlane]
-        X = X[ToPlane].T  
+        X = X[ToPlane].T
         V = V[ToPlane].T
         # interaction at y = 0, by construction:
-        t = (Y - y) / Vy  
+        t = (Y - y) / Vy
         assert (t > 0).all()
         Xint = X + V * t
         assert (np.abs(Xint[1] - Y) < eps).all()
@@ -71,23 +69,22 @@ class Foil:
 # Calibration Foil class, inherits from Generic Foil class:
 # class CalibrationFoil(OpticalComponent, Foil):
 class CalibrationFoil(Foil):
-    def __init__(self, hole_dist=7., hole_diam=1.2,
-                 normal=np.array([[0., 1., 0.]]), diam=55., epsilon_dia=0):
+    def __init__(self, normal=np.array([[0., 1., 0.]]), diam=50.,
+                 hole_dist=7., hole_diam=1.2):
         # OpticalComponent.__init__(self)
         Foil.__init__(self, ID=2, normal=normal, diam=diam)
-        self.fName = self.GetType()
-        self.fHdist = hole_dist
-        self.fHdmtr = hole_diam
-        self.holes = self.MakeHoles()
+        self.name = self.GetType()
+        self.hole_dist = hole_dist
+        self.hole_diam = hole_diam
+        self.holes = self.GetHoles()
 
-    def MakeHoles(self):
-        import os, sys, pickle
-        sys.path.append('macros')
+    def GetHoles(self):
+        import os
         from MakeCalibHoles import MakeHoles
-        calib_pickle = 'data/calib_holes.p'
-        if os.path.isfile(calib_pickle):
-            return pickle.load(open(calib_pickle, 'rb'))
-        return MakeHoles()
+        calibfile = 'data/calib_holes.npy'
+        if os.path.isfile(calibfile):
+            return np.load(calibfile)
+        return MakeHoles(fHdist=self.hole_dist, fHdmtr=self.hole_diam)
 
     def PrintHolePos(self, screen=False):
         print('Using Calibration Holes:')
@@ -97,7 +94,6 @@ class CalibrationFoil(Foil):
     def PassHole(self, X):
         masks = []
         for ihole in self.holes:
-            ihole = np.array(ihole)
             diff = X - ihole[:-1].reshape(3, 1)
             mask = np.diag(diff.T.dot(diff)) < (ihole[-1]**2) / 4.
             masks.append(mask)

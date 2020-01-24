@@ -11,8 +11,6 @@ logfile = name + '.log'  # log output will be directed to this file and to scree
 nrays = 100_000
 xmax = 25.
 
-make_plots = False
-
 beam = {
     'x': 0.,
     'y': 0.
@@ -66,7 +64,6 @@ camera = {
     'focal distance': 60.
 }
 
-
 level = logging.DEBUG if VERBOSE else logging.INFO
 # message = '%(levelname)s:%(name)s: %(message)s\n'
 # message = '%(levelname)s: %(message)s\n'
@@ -90,10 +87,7 @@ def GetTime(start=True):
     logger.info(message)
 
 
-GetTime()
 # Decorator to measure the time each function takes to run:
-
-
 def timer(func):
     def wrapper(*args, **kwargs):
         t0 = time.time()
