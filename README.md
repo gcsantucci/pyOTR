@@ -34,3 +34,4 @@ Size of initial square side to randomly generate the photons.
 ## Usage:
 python pyOTR.py
 
+The jupyter notebook "Examples" shows a few plots of the distribution of photons before and after passing by the Calibration Foil.
