@@ -1,5 +1,5 @@
 import numpy as np
-import CoordTrans
+from OpticalComponent import OpticalComponent
 
 foils = {
     0: 'Blank',
@@ -68,10 +68,10 @@ class Foil:
 
 # Calibration Foil class, inherits from Generic Foil class:
 # class CalibrationFoil(OpticalComponent, Foil):
-class CalibrationFoil(Foil):
+class CalibrationFoil(Foil, OpticalComponent):
     def __init__(self, normal=np.array([[0., 1., 0.]]), diam=50.,
-                 hole_dist=7., hole_diam=1.2):
-        # OpticalComponent.__init__(self)
+                 hole_dist=7., hole_diam=1.2, name=None):
+        OpticalComponent.__init__(self, name=name)
         Foil.__init__(self, ID=2, normal=normal, diam=diam)
         self.name = self.GetType()
         self.hole_dist = hole_dist
@@ -103,17 +103,15 @@ class CalibrationFoil(Foil):
         return passed
 
     def RaysTransport(self, X, V):
-        euler = np.array([0., np.pi / 2, 0.])
-        fTrCoord = CoordTrans.CoordTrans(X=np.zeros((1, 3)), angles=euler)
         # Go to local coords:
-        X = fTrCoord.TransfrmPoint(X)
-        V = fTrCoord.TransfrmVec(V)
+        X = self.transform_coord.TransfrmPoint(X)
+        V = self.transform_coord.TransfrmVec(V)
         # Get X interaction points and V reflected:
         Xint, Vr = self.PlaneTransport(X, V)
         passed = self.PassHole(Xint)
         Vr = np.array([v if p else vr
                        for p, v, vr in zip(passed, V.T, Vr.T)]).T
         # Transform back to the global coords:
-        Xint = fTrCoord.TransfrmPoint(Xint, inv=True)
-        Vr = fTrCoord.TransfrmVec(Vr, inv=True)
+        Xint = self.transform_coord.TransfrmPoint(Xint, inv=True)
+        Vr = self.transform_coord.TransfrmVec(Vr, inv=True)
         return Xint, Vr

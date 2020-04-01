@@ -53,7 +53,8 @@ def TransportRays():
     np.save(f'{cf.name}_Vinitial', V)
     rays = Rays.Rays(X=X, V=V)
     X, V = PrepareData(X, V)
-    calib = Foil.CalibrationFoil(normal=cf.foil['normal'], diam=cf.foil['diam'])
+    calib = Foil.CalibrationFoil(normal=cf.foil['normal'], diam=cf.foil['diam'], name='CalibFoil')
+    calib.Place(X=np.zeros((1, 3)), angles=np.array([0., np.pi / 2, 0.]))
 
     with concurrent.futures.ProcessPoolExecutor() as executor:
         results = executor.map(calib.RaysTransport, X, V)
@@ -73,7 +74,6 @@ def TransportRays():
 
     np.save(f'{cf.name}_Xfinal', Xf)
     np.save(f'{cf.name}_Vfinal', Vf)
-
 
 if __name__ == '__main__':
 
