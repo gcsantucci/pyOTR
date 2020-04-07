@@ -26,7 +26,7 @@ The main ones to change right now are:
 Set it to 1 to include debugging info.
 
 ### nrays:
-Number of photons to be simulated
+Number of photons to be simulated.
 
 ### xmax:
 Size of initial square side to randomly generate the photons.
