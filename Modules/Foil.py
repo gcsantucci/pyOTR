@@ -103,6 +103,8 @@ class CalibrationFoil(Foil, OpticalComponent):
         return passed
 
     def RaysTransport(self, X, V):
+        # X = rays.GetPosition()
+        # V = rays.GetDirection()
         # Go to local coords:
         X = self.transform_coord.TransfrmPoint(X)
         V = self.transform_coord.TransfrmVec(V)

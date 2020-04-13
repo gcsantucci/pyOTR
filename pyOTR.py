@@ -3,8 +3,8 @@ import numpy as np
 import sys
 sys.path.append('Modules/')
 import Config as cf
-import Rays
 import Foil
+import OpticalSystem
 
 
 @cf.timer
@@ -51,13 +51,17 @@ def TransportRays():
     X, V = GenerateRays(nrays=nrays, xmax=xmax)
     np.save(f'{cf.name}_Xinitial', X)
     np.save(f'{cf.name}_Vinitial', V)
-    rays = Rays.Rays(X=X, V=V)
     X, V = PrepareData(X, V)
-    calib = Foil.CalibrationFoil(normal=cf.foil['normal'], diam=cf.foil['diam'], name='CalibFoil')
+    calib = Foil.CalibrationFoil(
+        normal=cf.foil['normal'], diam=cf.foil['diam'], name='CalibFoil')
     calib.Place(X=np.zeros((1, 3)), angles=np.array([0., np.pi / 2, 0.]))
 
+    system = OpticalSystem.OpticalSystem()
+    system.AddComponent(calib)
+
     with concurrent.futures.ProcessPoolExecutor() as executor:
-        results = executor.map(calib.RaysTransport, X, V)
+        # results = executor.map(calib.RaysTransport, X, V)
+        results = executor.map(system.TraceRay, X, V)
         for i, result in enumerate(results):
             if i % 100 == 0:
                 cf.logger.debug(f'Running data chunck: {i}')
@@ -74,6 +78,7 @@ def TransportRays():
 
     np.save(f'{cf.name}_Xfinal', Xf)
     np.save(f'{cf.name}_Vfinal', Vf)
+
 
 if __name__ == '__main__':
 
