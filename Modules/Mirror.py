@@ -1,24 +1,26 @@
+import numpy as np
+
+
 class Mirror:
-      def __init__(self, x=1., y=1., fdist=2.):
-          self.x = x
-          self.y = y
-          self.fdist = fdist
+      def __init__(self):
+            pass
 
-      def __del__(self):
-          print('Mirror deleted.')
 
-      def SetPosition(self, x, y):
-          self.x = x
-          self.y = y
-      
-      def SetFocalDistance(self, dist):
-            self.fdist = dist
+class ParaMirror(Mirror):
+      def __init__(self, f, H, D, rough=False):
+            self.f = f  # focal length
+            self.H = H  # Height
+            self.D = D  # Diameter
+            self.rough = rough  # simulate roughness?
+            self.seed = 42
+            self.shift = np.array([[2. * self.f, self.f, 0]])
 
-      def SetReflectance(self, reflectance):
-            self.reflectance = reflectance
-          
-      def GetPosition(self):
-          return self.x, self.y
+      def Shift(self, X):
+            return X + self.shift
 
-      def GetDistance(self):
-            return self.fdist
+      def F_mirror(self, t, X, V):
+            Xr = X + (V * t)
+            Xp = np.array([Xr[0], 4. * self.f, Xr[2]])  # maybe .T
+            return Xr.dot(Xp)
+
+      def Fprime_mirror(self, t, X, V):
