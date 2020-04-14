@@ -75,14 +75,13 @@ def TransportRays():
             if i % 100 == 0:
                 cf.logger.debug(f'Running data chunck: {i}')
             x, v = result
-            print(x.shape)
             assert x.shape == v.shape
             if i == 0:
                 Xf = np.array(x)
                 Vf = np.array(v)
             else:
-                Xf = np.concatenate((Xf, x), axis=1)
-                Vf = np.concatenate((Vf, v), axis=1)
+                Xf = np.concatenate((Xf, x), axis=0)
+                Vf = np.concatenate((Vf, v), axis=0)
 
     Xf = np.array(Xf)
     Vf = np.array(Vf)

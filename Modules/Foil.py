@@ -114,7 +114,7 @@ class CalibrationFoil(Foil, OpticalComponent):
         Xint, Vr = self.PlaneTransport(X, V)
         passed = self.PassHole(Xint)
         Vr = np.array([v if p else vr
-                       for p, v, vr in zip(passed, V.T, Vr.T)]).T
+                       for p, v, vr in zip(passed, V, Vr)])
         # Transform back to the global coords:
         Xint = self.transform_coord.TransfrmPoint(Xint, inv=True)
         Vr = self.transform_coord.TransfrmVec(Vr, inv=True)
