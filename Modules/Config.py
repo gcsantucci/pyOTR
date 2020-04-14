@@ -5,7 +5,7 @@ import numpy as np
 
 VERBOSE = 1  # Set to 1 for debugging info
 
-name = 'output/CompTest'  # name prefix used to create all outputs
+name = 'output/testimage'  # name prefix used to create all outputs
 logfile = name + '.log'  # log output will be directed to this file and to screen
 
 nrays = 100_000
