@@ -8,7 +8,7 @@ VERBOSE = 1  # Set to 1 for debugging info
 name = 'output/CompTest'  # name prefix used to create all outputs
 logfile = name + '.log'  # log output will be directed to this file and to screen
 
-nrays = 1_000_000
+nrays = 10_000
 xmax = 25.
 
 beam = {
