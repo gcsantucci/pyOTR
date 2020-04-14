@@ -14,18 +14,9 @@ def PrepareData(X, V):
     assert X.shape[0] == V.shape[0]
     chunck = 1_000
     n = X.shape[0] // chunck
-    r = X.shape[0] % chunck
-
-    nchuncks = n if r == 0 else n + 1
-    cf.logger.info(f'Dividing the data into {nchuncks} chuncks')
-
-    Xc, Vc = [], []
-    for i in range(n):
-        Xc.append(X[chunck * i: chunck * (i + 1)])
-        Vc.append(V[chunck * i: chunck * (i + 1)])
-    if r > 0:
-        Xc.append(X[chunck * n:])
-        Vc.append(V[chunck * n:])
+    cf.logger.info(f'Dividing the data into {n} chuncks')
+    Xc = X[:n * chunck].reshape(n, chunck, 3)
+    Vc = V[:n * chunck].reshape(n, chunck, 3)
     return np.array(Xc), np.array(Vc)
 
 
@@ -44,7 +35,7 @@ def GenerateRays(nrays=100_000, xmax=25.):
 
 
 @cf.timer
-def TransportRays():
+def SimulateOTR():
     nrays = cf.nrays
     xmax = cf.xmax
     cf.logger.info(f'Tracing {nrays:,} rays!')
@@ -58,18 +49,14 @@ def TransportRays():
         normal=cf.foil['normal'], diam=cf.foil['diam'], name='CalibFoil')
     calib.Place(X=np.zeros((1, 3)), angles=np.array([0., np.pi / 2, 0.]))
 
-    mirror1 = Mirror.PlaneMirror(R=10.)
-    mirror1.Place(X=np.array([[0., 0., 10.]]),
-                  angles=np.array([0., np.pi / 2, 0.]))
+    mirror1 = Mirror.PlaneMirror(normal=cf.M0['normal'], R=cf.M0['R'])
+    mirror1.Place(X=cf.M0['X'], angles=cf.M0['angles'])
 
     system = OpticalSystem.OpticalSystem()
     system.AddComponent(calib)
-    # system.AddComponent(mirror1)
-
-    print(X.shape)
+    system.AddComponent(mirror1)
 
     with concurrent.futures.ProcessPoolExecutor() as executor:
-        # results = executor.map(calib.RaysTransport, X, V)
         results = executor.map(system.TraceRay, X, V)
         for i, result in enumerate(results):
             if i % 100 == 0:
@@ -94,6 +81,6 @@ if __name__ == '__main__':
 
     cf.GetTime(start=True)
 
-    TransportRays()
+    SimulateOTR()
 
     cf.GetTime(start=False)
