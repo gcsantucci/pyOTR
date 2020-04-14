@@ -7,7 +7,7 @@ import Foil
 import Mirror
 import OpticalSystem
 
-
+#Rowan
 @cf.timer
 def PrepareData(X, V):
     assert X.shape[1] == V.shape[1] == 3
