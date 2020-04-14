@@ -4,6 +4,7 @@ import sys
 sys.path.append('Modules/')
 import Config as cf
 import Foil
+import Mirror
 import OpticalSystem
 
 
@@ -52,12 +53,20 @@ def TransportRays():
     np.save(f'{cf.name}_Xinitial', X)
     np.save(f'{cf.name}_Vinitial', V)
     X, V = PrepareData(X, V)
+
     calib = Foil.CalibrationFoil(
         normal=cf.foil['normal'], diam=cf.foil['diam'], name='CalibFoil')
     calib.Place(X=np.zeros((1, 3)), angles=np.array([0., np.pi / 2, 0.]))
 
+    mirror1 = Mirror.PlaneMirror(R=10.)
+    mirror1.Place(X=np.array([[0., 0., 10.]]),
+                  angles=np.array([0., np.pi / 2, 0.]))
+
     system = OpticalSystem.OpticalSystem()
     system.AddComponent(calib)
+    # system.AddComponent(mirror1)
+
+    print(X.shape)
 
     with concurrent.futures.ProcessPoolExecutor() as executor:
         # results = executor.map(calib.RaysTransport, X, V)
@@ -66,12 +75,13 @@ def TransportRays():
             if i % 100 == 0:
                 cf.logger.debug(f'Running data chunck: {i}')
             x, v = result
+            assert x.shape == v.shape
             if i == 0:
                 Xf = np.array(x)
                 Vf = np.array(v)
             else:
-                Xf = np.concatenate((Xf, x), axis=1)
-                Vf = np.concatenate((Vf, v), axis=1)
+                Xf = np.concatenate((Xf, x), axis=0)
+                Vf = np.concatenate((Vf, v), axis=0)
 
     Xf = np.array(Xf)
     Vf = np.array(Vf)

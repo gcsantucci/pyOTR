@@ -8,7 +8,7 @@ VERBOSE = 1  # Set to 1 for debugging info
 name = 'output/CompTest'  # name prefix used to create all outputs
 logfile = name + '.log'  # log output will be directed to this file and to screen
 
-nrays = 1_000_000
+nrays = 100_000
 xmax = 25.
 
 beam = {
@@ -27,9 +27,9 @@ light = {
 light_source = 0
 
 foil = {
-    'ID':     1,
+    'ID': 1,
     'normal': np.array([[0, -1, 0]]),
-    'diam':   50.  # 55.0, original C++ code, not sure why
+    'diam': 50.  # 55.0, original C++ code, not sure why
 }
 
 mirror1 = {
@@ -59,8 +59,8 @@ mirror4 = {
 mirrors = [mirror1, mirror2, mirror3, mirror4]
 
 camera = {
-    'npxlX':    484,
-    'npxlY':    704,
+    'npxlX': 484,
+    'npxlY': 704,
     'focal distance': 60.
 }
 

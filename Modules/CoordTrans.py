@@ -1,9 +1,9 @@
 import numpy as np
-from numpy import cos, sin, pi
+from numpy import cos, sin
 
 
 class CoordTrans():
-    def __init__(self, X=np.zeros((1, 3)), angles=np.zeros(3)): 
+    def __init__(self, X=np.zeros((1, 3)), angles=np.zeros(3)):
         # angles = phi, theta, psi
         self.X = X
         self.angles = angles
@@ -21,13 +21,13 @@ class CoordTrans():
         self.angles = angles
         self.M = self.GetM()
 
-    def GetM(self):        
+    def GetM(self):
         phi, theta, psi = self.angles
         # Rotation of phi around z
         R1 = np.array([[cos(phi), sin(phi), 0],
                        [-sin(phi), cos(phi), 0],
                        [0, 0, 1]])
-        # Rotation of theta around x_prime 
+        # Rotation of theta around x_prime
         R2 = np.array([[1, 0, 0],
                        [0, cos(theta), sin(theta)],
                        [0, -sin(theta), cos(theta)]])
@@ -38,10 +38,10 @@ class CoordTrans():
         return R3.dot(R2.dot(R1))
 
     def DoPointTrans(self, points, inv=False):
-        return points + self.X.T if inv else points - self.X
+        return points + self.X if inv else points - self.X
 
     def DoPointRot(self, points, inv=False):
-        return self.M.T.dot(points) if inv else self.M.dot(points.T)
+        return points.dot(self.M) if inv else points.dot(self.M.T)
 
     def TransfrmPoint(self, points, inv=False):
         if inv:
