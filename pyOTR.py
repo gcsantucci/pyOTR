@@ -5,9 +5,14 @@ sys.path.append('Modules/')
 import Config as cf
 import Foil
 import Mirror
+import ImagePlane
 import OpticalSystem
 
-#Rowan
+
+def Conv(deg):
+    return (np.pi * deg) / 180.
+
+
 @cf.timer
 def PrepareData(X, V):
     assert X.shape[1] == V.shape[1] == 3
@@ -27,7 +32,7 @@ def GenerateRays(nrays=100_000, xmax=25.):
     X, V = [], []
     for i in range(nrays):
         x = xmax * np.random.uniform(-1., 1., 3)
-        x[-1] = -1.
+        x[-1] = -100.
         v = [0., 0., 1.]
         X.append(x)
         V.append(v)
@@ -36,11 +41,17 @@ def GenerateRays(nrays=100_000, xmax=25.):
 
 @cf.timer
 def SimulateOTR():
-    nrays = cf.nrays
-    xmax = cf.xmax
-    cf.logger.info(f'Tracing {nrays:,} rays!')
+    # nrays = cf.nrays
+    # xmax = cf.xmax
+    # cf.logger.info(f'Tracing {nrays:,} rays!')
+    # X, V = GenerateRays(nrays=nrays, xmax=xmax)
 
-    X, V = GenerateRays(nrays=nrays, xmax=xmax)
+    files = 'data/test_images.npy'
+    X = np.load(f'{files}')
+    X = X * 10
+    X[:, 2] = -100.
+    V = np.array([[0., 0., 1.]] * X.shape[0])
+
     np.save(f'{cf.name}_Xinitial', X)
     np.save(f'{cf.name}_Vinitial', V)
     X, V = PrepareData(X, V)
@@ -49,12 +60,22 @@ def SimulateOTR():
         normal=cf.foil['normal'], diam=cf.foil['diam'], name='CalibFoil')
     calib.Place(X=np.zeros((1, 3)), angles=np.array([0., np.pi / 2, 0.]))
 
-    mirror1 = Mirror.PlaneMirror(normal=cf.M0['normal'], R=cf.M0['R'])
-    mirror1.Place(X=cf.M0['X'], angles=cf.M0['angles'])
+    mirror1 = Mirror.PlaneMirror(normal=np.array([[0., 0., -1.]]), R=50.)
+    mirror1.Place(X=np.array([[0., 0., 0.]]),
+                  angles=np.array([0., Conv(45), 0.]), yrot=True)
+
+    M2 = Mirror.ParaMirror(name='ParaMirror')
+    M2.Place(X=np.array([[1100., 0., 0.]]), angles=np.array([0., 0., 0.]))
+
+    image = ImagePlane.ImagePlane(R=100.)
+    image.Place(X=np.array([[1100., -10., 0.]]),
+                angles=np.array([0., Conv(90), 0.]))
 
     system = OpticalSystem.OpticalSystem()
-    system.AddComponent(calib)
+    # system.AddComponent(calib)
     system.AddComponent(mirror1)
+    system.AddComponent(M2)
+    system.AddComponent(image)
 
     with concurrent.futures.ProcessPoolExecutor() as executor:
         results = executor.map(system.TraceRay, X, V)

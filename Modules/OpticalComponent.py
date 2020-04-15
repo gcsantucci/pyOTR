@@ -1,6 +1,7 @@
 import numpy as np
 import CoordTrans
 
+
 class OpticalComponent:
     def __init__(self, name=None):
         self.name = name
@@ -17,8 +18,8 @@ class OpticalComponent:
     def GetOrientation(self):
         return self.angles
 
-    def Place(self, X=np.zeros((1, 3)), angles=np.zeros(3)):
+    def Place(self, X=np.zeros((1, 3)), angles=np.zeros(3), yrot=False):
         self.X = X
         self.angles = angles
-        self.transform_coord = CoordTrans.CoordTrans(X=self.X, angles=self.angles)
-
+        self.transform_coord = CoordTrans.CoordTrans(
+            X=self.X, angles=self.angles, yrot=yrot)

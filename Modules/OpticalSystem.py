@@ -3,7 +3,6 @@ import numpy as np
 
 class OpticalSystem():
     def __init__(self):
-        print('Hello from OpticalSystem')
         self.components = []
 
     def AddComponent(self, component):

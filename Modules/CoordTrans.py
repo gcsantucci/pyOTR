@@ -3,11 +3,13 @@ from numpy import cos, sin
 
 
 class CoordTrans():
-    def __init__(self, X=np.zeros((1, 3)), angles=np.zeros(3)):
+    def __init__(self, X=np.zeros((1, 3)), angles=np.zeros(3), yrot=False):
         # angles = phi, theta, psi
         self.X = X
         self.angles = angles
         self.M = self.GetM()
+        if yrot:
+            self.M = self.GetM2()
 
     def Reset(self):
         self.X = np.zeros((1, 3))
@@ -36,6 +38,14 @@ class CoordTrans():
                        [-sin(psi), cos(psi), 0],
                        [0, 0, 1]])
         return R3.dot(R2.dot(R1))
+
+    def GetM2(self):
+        phi, theta, psi = self.angles
+        # Rotation around the y-axis
+        R = np.array([[cos(theta), 0., sin(theta)],
+                      [0., 1., 0.],
+                      [-sin(theta), 0., cos(theta)]])
+        return R
 
     def DoPointTrans(self, points, inv=False):
         return points + self.X if inv else points - self.X
