@@ -75,7 +75,7 @@ class CalibrationFoil(Foil, OpticalComponent):
                  hole_dist=7., hole_diam=1.2, name=None):
         OpticalComponent.__init__(self, name=name)
         Foil.__init__(self, ID=2, normal=normal, diam=diam)
-        self.name = self.GetType()
+        # self.name = self.GetType()
         self.hole_dist = hole_dist
         self.hole_diam = hole_diam
         self.holes = self.GetHoles()

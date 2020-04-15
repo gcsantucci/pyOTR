@@ -7,6 +7,7 @@ class Beam():
     def __init__(self):
         self.PID = cf.beam['PID']
         self.chunck = cf.beam['chunck']
+        self.Z0 = cf.beam['Z0']
 
     def PrepareData(self, X, V):
         assert X.shape[1] == V.shape[1] == 3
@@ -43,17 +44,16 @@ class Beam():
             if Xtype == 'square':
                 self.nrays = cf.beam['nrays']
                 self.size = cf.beam['size']
-                self.Z0 = cf.beam['Z0']
                 X = self.GenerateRaysX()
             elif Xtype == 'testimage':
                 X = np.load('data/test_images.npy')
                 X = X * 10
-                X[:, 2] = -100.
+                X[:, 2] = self.Z0
             else:
                 cf.logger.info('Unknown position distribution...exiting')
                 sys.exit()
             V = self.GenerateRaysV(X.shape)
-            return self.PrepareData(X, V)
+            return X, V
         elif self.PID == 2212:
             cf.logger.info(f'Selected Proton Beam')
             cf.logger.info('Not yet implemented...exiting')

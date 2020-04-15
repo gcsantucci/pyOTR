@@ -2,10 +2,10 @@ import numpy as np
 from OpticalComponent import OpticalComponent
 
 
-class Mirror:
+class Mirror(OpticalComponent):
     def __init__(self, name=None):
-        self.name = name
-
+        OpticalComponent.__init__(self, name=name)
+    
     def PlaneTransport(self, X, V):
         X, V = self.PlaneIntersect(X, V)
         return X, self.PlaneReflect(V)
@@ -22,7 +22,8 @@ class Mirror:
         return X, V
 
 
-class PlaneMirror(Mirror, OpticalComponent):
+#class PlaneMirror(Mirror, OpticalComponent):
+class PlaneMirror(Mirror):
     def __init__(self, normal=np.array([[0., 0., -1.]]), R=20.):
         Mirror.__init__(self, name='PlaneMirror')
         self.normal = normal
@@ -64,7 +65,8 @@ class PlaneMirror(Mirror, OpticalComponent):
         return X, V
 
 
-class ParaMirror(Mirror, OpticalComponent):
+#class ParaMirror(Mirror, OpticalComponent):
+class ParaMirror(Mirror):    
     def __init__(self, f=550., H=120., D=120., rough=False, name=None):
         Mirror.__init__(self, name=name)
         self.f = f  # focal length

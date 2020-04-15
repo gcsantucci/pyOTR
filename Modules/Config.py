@@ -5,14 +5,15 @@ import numpy as np
 
 VERBOSE = 1  # Set to 1 for debugging info
 
+save = True
 name = 'output/imagetest'  # name prefix used to create all outputs
 logfile = name + '.log'  # log output will be directed to this file and to screen
 
 beam = {
     'PID': 22,  # PDG PID: 22 for photons and 2212 for proton beam
-    'Xtype': 'square',  # Create sqaure grid or use testimage
+    'Xtype': 'testimage',  # Create sqaure grid or use testimage
     'nrays': 100_000,
-    'chunck': 1_000,
+    'chunck': 1_000,  # 0 if no division is to be made
     'size': 25.,
     'Z0': -100.,
     'Vtype': 'parallel',
@@ -33,7 +34,7 @@ light_source = 0
 foil = {
     'ID': 1,
     'normal': np.array([[0, -1, 0]]),
-    'diam': 50.  # 55.0, original C++ code, not sure why
+    'D': 50.  # diameter - 55.0, original C++ code, not sure why
 }
 
 M0 = {
