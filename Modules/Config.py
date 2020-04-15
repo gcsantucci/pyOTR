@@ -8,10 +8,14 @@ VERBOSE = 1  # Set to 1 for debugging info
 name = 'output/imagetest'  # name prefix used to create all outputs
 logfile = name + '.log'  # log output will be directed to this file and to screen
 
-nrays = 1_000_000
-xmax = 25.
-
 beam = {
+    'PID': 22,  # PDG PID: 22 for photons and 2212 for proton beam
+    'Xtype': 'square',  # Create sqaure grid or use testimage
+    'nrays': 100_000,
+    'chunck': 1_000,
+    'size': 25.,
+    'Z0': -100.,
+    'Vtype': 'parallel',
     'x': 0.,
     'y': 0.
 }

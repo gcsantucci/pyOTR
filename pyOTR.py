@@ -3,6 +3,7 @@ import numpy as np
 import sys
 sys.path.append('Modules/')
 import Config as cf
+import Beam
 import Foil
 import Mirror
 import ImagePlane
@@ -14,47 +15,7 @@ def Conv(deg):
 
 
 @cf.timer
-def PrepareData(X, V):
-    assert X.shape[1] == V.shape[1] == 3
-    assert X.shape[0] == V.shape[0]
-    chunck = 1_000
-    n = X.shape[0] // chunck
-    cf.logger.info(f'Dividing the data into {n} chuncks')
-    Xc = X[:n * chunck].reshape(n, chunck, 3)
-    Vc = V[:n * chunck].reshape(n, chunck, 3)
-    return np.array(Xc), np.array(Vc)
-
-
-@cf.timer
-def GenerateRays(nrays=100_000, xmax=25.):
-    cf.logger.info(
-        f'Generating {nrays:,} rays at random positions in a {xmax:.0f}x{xmax:.0f} square!')
-    X, V = [], []
-    for i in range(nrays):
-        x = xmax * np.random.uniform(-1., 1., 3)
-        x[-1] = -100.
-        v = [0., 0., 1.]
-        X.append(x)
-        V.append(v)
-    return np.array(X), np.array(V)
-
-
-@cf.timer
-def SimulateOTR():
-    # nrays = cf.nrays
-    # xmax = cf.xmax
-    # cf.logger.info(f'Tracing {nrays:,} rays!')
-    # X, V = GenerateRays(nrays=nrays, xmax=xmax)
-
-    files = 'data/test_images.npy'
-    X = np.load(f'{files}')
-    X = X * 10
-    X[:, 2] = -100.
-    V = np.array([[0., 0., 1.]] * X.shape[0])
-
-    np.save(f'{cf.name}_Xinitial', X)
-    np.save(f'{cf.name}_Vinitial', V)
-    X, V = PrepareData(X, V)
+def SimulateOTR(X, V):
 
     calib = Foil.CalibrationFoil(
         normal=cf.foil['normal'], diam=cf.foil['diam'], name='CalibFoil')
@@ -100,8 +61,13 @@ def SimulateOTR():
 
 if __name__ == '__main__':
 
-    cf.GetTime(start=True)
+    cf.GetTime()
 
-    SimulateOTR()
+    beam = Beam.Beam()
+    X, V = beam.GenerateBeam()
+    print(X.shape)
+    print(V.shape)
+
+    SimulateOTR(X, V)
 
     cf.GetTime(start=False)
