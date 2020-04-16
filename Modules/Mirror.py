@@ -89,14 +89,14 @@ class ParaMirror(Mirror):
         return f, fprime
 
     def GetNormal(self, X):
-        normal = np.array([-X[:, 0] + self.f2,
+        normal = np.array([-(X[:, 0] + self.f2),
                            [self.f2] * X.shape[0],
                            -X[:, 2]]).T
         normal = normal / self.f2
         if self.rough:
             normal = normal + \
                 np.random.normal(0., 0.00019, normal.shape[0])
-        mag = np.diag(normal.dot(normal.T)).reshape(normal.shape[0], 1)
+        mag = np.sqrt(np.diag(normal.dot(normal.T)).reshape(normal.shape[0], 1))
         return normal / mag
 
     def PlaneReflect(self, V):
