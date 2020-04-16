@@ -3,7 +3,8 @@ from OpticalComponent import OpticalComponent
 
 
 class ImagePlane(OpticalComponent):
-    def __init__(self, R=20.):
+    def __init__(self, R=20., name='ImagePlane'):
+        OpticalComponent.__init__(self, name=name)
         self.name = 'ImagePlane'
         self.R = R
 

@@ -3,22 +3,28 @@ import datetime
 import time
 import numpy as np
 
+
+def Conv(deg):
+    return (np.pi * deg) / 180.
+
+
 VERBOSE = 1  # Set to 1 for debugging info
 
 save = True
-name = 'output/imagetest'  # name prefix used to create all outputs
+name = 'output/pencil'  # name prefix used to create all outputs
 logfile = name + '.log'  # log output will be directed to this file and to screen
 
 beam = {
     'PID': 22,  # PDG PID: 22 for photons and 2212 for proton beam
-    'Xtype': 'testimage',  # Create sqaure grid or use testimage
-    'nrays': 100_000,
+    'Xtype': 'pencil',  # Create square grid, pencil beam or use testimage
+    'nrays': 1_000_000,
     'chunck': 1_000,  # 0 if no division is to be made
     'size': 25.,
-    'Z0': -100.,
     'Vtype': 'parallel',
     'x': 0.,
-    'y': 0.
+    'y': 0.,
+    'z': -100.,
+    'cov': np.diag([10., 10., 0.])
 }
 
 light = {
@@ -31,55 +37,85 @@ light = {
 
 light_source = 0
 
+foils = {
+    0: 'Blank',
+    1: 'Fluorescent',
+    2: 'Calibration',
+    3: 'Ti1',
+    4: 'Ti2',
+    5: 'Ti3',
+    6: 'Ti4',
+    7: 'Cross'
+}
+
 foil = {
-    'ID': 1,
+    'X': np.zeros((1, 3)),
+    'angles': np.array([0., Conv(90), 0.]),
     'normal': np.array([[0, -1, 0]]),
-    'D': 50.  # diameter - 55.0, original C++ code, not sure why
+    'D': 50.,  # diameter - 55.0, original C++ code, not sure why
+    'name': foils[2]
 }
 
 M0 = {
-    'name': 'PlaneMirror',
     'normal': np.array([[0., 0., -1.]]),
-    'R': 15.,
-    'X': np.array([[0., 0., 10.]]),
-    'angles': np.zeros(3)
+    'R': 100.,
+    'X': np.zeros((1, 3)),
+    'angles': np.array([0., Conv(45), 0.]),
+    'yrot': True,
+    'name': 'PlaneMirror'
 }
 
-mirror1 = {
-    'x': 1.,
-    'y': 2.,
-    'f': 3.
+M1 = {
+    'X': np.array([[1100., 0., 0.]]),
+    'angles': np.array([0., 0., 0.]),
+    'f': 550.,
+    'H': 120.,
+    'D': 120.,
+    'rough': False,
+    'name': 'ParaMirror1'
 }
 
-mirror2 = {
-    'x': 4.,
-    'y': 5.,
-    'f': 6.
+M2 = {
+    'X': np.array([[1100., 3850., 0.]]),
+    'angles': np.array([0., Conv(180), 0.]),
+    'f': 550.,
+    'H': 120.,
+    'D': 120.,
+    'rough': False,
+    'name': 'ParaMirror2'
 }
 
-mirror3 = {
-    'x': 7.,
-    'y': 8.,
-    'f': 9.
+M3 = {
+    'X': np.array([[-1100., 3850., 0.]]),
+    'angles': np.array([Conv(90), Conv(180), Conv(-90)]),
+    'f': 550.,
+    'H': 120.,
+    'D': 120.,
+    'rough': False,
+    'name': 'ParaMirror3'
 }
 
-mirror4 = {
-    'x': 10.,
-    'y': 11.,
-    'f': 12.
+M4 = {
+    'X': np.array([[-1100., 6522., 0.]]),
+    'angles': np.array([Conv(180.), 0., 0.]),
+    'f': 300.,
+    'H': 120.,
+    'D': 120.,
+    'rough': False,
+    'name': 'ParaMirror4'
 }
-
-mirrors = [mirror1, mirror2, mirror3, mirror4]
 
 camera = {
     'npxlX': 484,
     'npxlY': 704,
-    'focal distance': 60.
+    'focal distance': 60.,
+    'X': np.array([[1100., -10., 0.]]),
+    'angles': np.array([0., Conv(90), 0.]),
+    'R': 100.,
+    'name': 'ImagePlane'
 }
 
 level = logging.DEBUG if VERBOSE else logging.INFO
-# message = '%(levelname)s:%(name)s: %(message)s\n'
-# message = '%(levelname)s: %(message)s\n'
 message = '%(message)s\n'
 logging.basicConfig(filename=logfile, filemode='w', format=message)
 logger = logging.getLogger('pyOTR')

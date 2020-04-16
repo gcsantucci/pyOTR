@@ -6,8 +6,12 @@ import Config as cf
 class Beam():
     def __init__(self):
         self.PID = cf.beam['PID']
+        self.nrays = cf.beam['nrays']
         self.chunck = cf.beam['chunck']
-        self.Z0 = cf.beam['Z0']
+        self.x = cf.beam['x']
+        self.y = cf.beam['y']
+        self.z = cf.beam['z']
+        self.cov = cf.beam['cov']
 
     def PrepareData(self, X, V):
         assert X.shape[1] == V.shape[1] == 3
@@ -17,13 +21,6 @@ class Beam():
         X = X[:n * self.chunck].reshape(n, self.chunck, 3)
         V = V[:n * self.chunck].reshape(n, self.chunck, 3)
         return X, V
-
-    def GenerateRaysX(self):
-        cf.logger.info(
-            f'Generating {self.nrays:,} rays at random positions on a {self.size:.0f} square.')
-        X = self.size * np.random.uniform(-1., 1., (self.nrays, 3))
-        X[:, 2] = self.Z0
-        return X
 
     def GenerateRaysV(self, n):
         Vtype = cf.beam['Vtype']
@@ -42,18 +39,26 @@ class Beam():
             cf.logger.info(f'Selected Photon Beam')
             Xtype = cf.beam['Xtype']
             if Xtype == 'square':
-                self.nrays = cf.beam['nrays']
                 self.size = cf.beam['size']
-                X = self.GenerateRaysX()
+                X = self.size * np.random.uniform(-1., 1., (self.nrays, 3))
+                X[:, 2] = self.z
+
+            elif Xtype == 'pencil':
+                mean = [self.x, self.y, self.z]
+                X = np.random.multivariate_normal(mean, self.cov, self.nrays)
+
             elif Xtype == 'testimage':
                 X = np.load('data/test_images.npy')
                 X = X * 10
-                X[:, 2] = self.Z0
+                X[:, 2] = self.z
+
             else:
                 cf.logger.info('Unknown position distribution...exiting')
                 sys.exit()
             V = self.GenerateRaysV(X.shape)
+
             return X, V
+
         elif self.PID == 2212:
             cf.logger.info(f'Selected Proton Beam')
             cf.logger.info('Not yet implemented...exiting')

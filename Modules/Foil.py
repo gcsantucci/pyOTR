@@ -1,30 +1,13 @@
 import numpy as np
 from OpticalComponent import OpticalComponent
 
-foils = {
-    0: 'Blank',
-    1: 'Fluorescent',
-    2: 'Calibration',
-    3: 'Ti1',
-    4: 'Ti2',
-    5: 'Ti3',
-    6: 'Ti4',
-    7: 'Cross'
-}
-
 
 # Generic Foil class, common among all Foils:
-class Foil:
-    def __init__(self, ID=1, normal=np.array([[0, 1, 0]]), diam=50.):
-        self.ID = ID
+class Foil(OpticalComponent):
+    def __init__(self, normal=np.array([[0, 1, 0]]), diam=50., name=None):
+        OpticalComponent.__init__(self, name=name)
         self.diam = diam
         self.normal = normal
-
-    def GetID(self):
-        return self.ID
-
-    def GetType(self):
-        return foils[self.ID]
 
     def GetDiameter(self):
         return self.diam
@@ -70,12 +53,10 @@ class Foil:
 
 # Calibration Foil class, inherits from Generic Foil class:
 # class CalibrationFoil(OpticalComponent, Foil):
-class CalibrationFoil(Foil, OpticalComponent):
+class CalibrationFoil(Foil):
     def __init__(self, normal=np.array([[0., 1., 0.]]), diam=50.,
                  hole_dist=7., hole_diam=1.2, name=None):
-        OpticalComponent.__init__(self, name=name)
-        Foil.__init__(self, ID=2, normal=normal, diam=diam)
-        # self.name = self.GetType()
+        Foil.__init__(self, normal=normal, diam=diam)
         self.hole_dist = hole_dist
         self.hole_diam = hole_diam
         self.holes = self.GetHoles()

@@ -5,18 +5,10 @@ sys.path.append('Modules/')
 import Config as cf
 import Beam
 import Geometry
-# import Foil
-# import Mirror
-# import ImagePlane
-import OpticalSystem
 
 
 @cf.timer
-def SimulateOTR(X, V, components):
-
-    system = OpticalSystem.OpticalSystem()
-    for component in components:
-        system.AddComponent(component)
+def SimulateOTR(X, V, system):
 
     with concurrent.futures.ProcessPoolExecutor() as executor:
         results = executor.map(system.TraceRay, X, V)
@@ -51,10 +43,10 @@ if __name__ == '__main__':
         X, V = beam.PrepareData(X, V)
 
     # Get the optical components to be simulated:
-    components = Geometry.GetGeometry()
+    system = Geometry.GetGeometry()
 
     # Run simulation:
-    X, V = SimulateOTR(X, V, components)
+    X, V = SimulateOTR(X, V, system)
 
     if cf.save:
         np.save(f'{cf.name}_Xfinal', X)
