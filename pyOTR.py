@@ -6,6 +6,7 @@ import Config as cf
 import Beam
 import Geometry
 
+np.set_printoptions(precision=4)
 
 @cf.timer
 def SimulateOTR(X, V, system):

@@ -9,9 +9,6 @@ class Foil(OpticalComponent):
         self.diam = diam
         self.normal = normal
 
-    def GetDiameter(self):
-        return self.diam
-
     def PlaneIntersect(self, X, V):
         y = X[:, 1]     # selects the y component of all rays
         Vy = V[:, 1]    # selects the vy component of all rays
