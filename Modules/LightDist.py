@@ -18,6 +18,12 @@ def RotateX(ray, angle):
     return M.dot(ray)
 
 
+def Landau(mu, sigma):
+    x = (x - mu) / sigma
+    A = 1 / (2 * pi)
+    A * np.exp(-(x + np.exp(-x)) / 2)
+
+
 class LightDist():
     def __init__(self, seed=0):
         self.beam_gamma = 32.
@@ -114,7 +120,7 @@ class LightDist():
         r = np.sqrt(ray[0] * ray[0] + ray[1] * ray[1] + ray[2] * ray[2])
         return np.arccos(ray[2] / r), np.arctan2(ray[1] / ray[0])
 
-    def GetLightRay(self, V, f_ang, angl_sprd, gamma, tht_range):
+    def GetLightRay(self, V, angl_sprd, gamma, tht_range):
         # New method
         light_ray = np.array(V)
         sangle = self.ScatterAngle(0)
@@ -154,10 +160,6 @@ class LightDist():
                 vx = light_ray[0]
                 vy = light_ray[1]
                 vz = light_ray[2]
-                # Switch light_ray[0] / [1](just so that we can use simple method for finding theta)
-                light_ray[2] = vx
-                light_ray[0] = vz
-                f_ang, _ = self.GetAngles(light_ray)
         else:
             # Original method for OTR light distribution
             if(gamma != 0.):  # Otr light
@@ -178,8 +180,8 @@ class LightDist():
             vx = cos(phi1) * sin(tht1)
             vy = sin(phi1) * sin(tht1)
             vz = cos(tht1)
-            light_ray = [vz, vy, vx]
-            f_ang, _ = self.GetAngles(light_ray)
+        V = np.array([vx, vy, vz])
+        return V
 
     def DistanceDiff(self, oangle, phi0, theta0, phi1, theta1):
         lat0 = pi / 2 - theta0

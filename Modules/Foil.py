@@ -1,5 +1,6 @@
 import numpy as np
 from OpticalComponent import OpticalComponent
+from LightDist import LightDist
 
 
 # Generic Foil class, common among all Foils:
@@ -49,7 +50,6 @@ class Foil(OpticalComponent):
 
 
 # Calibration Foil class, inherits from Generic Foil class:
-# class CalibrationFoil(OpticalComponent, Foil):
 class CalibrationFoil(Foil):
     def __init__(self, normal=np.array([[0., 1., 0.]]), diam=50.,
                  hole_dist=7., hole_diam=1.2, name=None):
@@ -95,3 +95,37 @@ class CalibrationFoil(Foil):
         Xint = self.transform_coord.TransfrmPoint(Xint, inv=True)
         Vr = self.transform_coord.TransfrmVec(Vr, inv=True)
         return Xint, Vr
+
+
+class MetalFoil(Foil):
+    def __init__(self, reflectivity, dffs, normal=np.array([[0., 1., 0.]]), diam=50., name=None):
+        Foil.__init__(self, normal=normal, diam=diam)
+        self.rflct = reflectivity
+        self.dffs = dffs
+        self.light = LightDist()
+
+    def SetScatterOption(self, h=1, s=0, o=0):
+        # Sets which light scatter method fLight should use
+        self.light.SetScatterOption(h, o, s)
+        # Prints to ensure that correct option was set
+        print(f'h: {self.light.GetScatterOption(1)}, s: {self.light.GetScatterOption(2)}, o: {self.light.GetScatterOption(3)}')
+
+    def RayTransport(self, pid, gamma, X, V):
+        # Go to local coords:
+        X = self.transform_coord.TransfrmPoint(X)
+        V = self.transform_coord.TransfrmVec(V)
+        # Get X interaction points and V reflected:
+        X, V = self.PlaneTransport(X, V)
+        if pid == 1:  # photons:
+            # we'll mask many photons out, based on the reflectivity of the foil:
+            mask = np.random.uniform(0., 1., size=X.shape[0]) >= self.rflct
+            X = X[mask]
+            V = V[mask]
+            V = self.light.GetLightRay(V, self.dffs, 0., 0)
+        else:  # get OTR ray:
+            # Light scatter code implemented in this function - velocity is changed here:
+            V = self.light.GetLightRay(V, self.dffs, gamma, 1)
+        # Transform back to the global coords:
+        X = self.transform_coord.TransfrmPoint(X, inv=True)
+        V = self.transform_coord.TransfrmVec(V, inv=True)
+        return X, V
