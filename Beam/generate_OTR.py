@@ -3,6 +3,7 @@ import numpy as np
 import Config as cf
 import Beam
 import Geometry
+from PrepareData import PrepareData
 
 @cf.timer
 def SimulateBeam(X, V, system):
@@ -33,8 +34,9 @@ if __name__ == '__main__':
     if cf.save:
         np.save(f'{cf.name}_protonsX', X)
         np.save(f'{cf.name}_protonsV', V)
-    if beam.chunck > 0:
-        X, V = beam.PrepareData(X, V)
+
+    if cf.chunck > 0:
+        X, V = beam.PrepareData(X, V, chunck=cf.chunck)
 
     # Get the Foil Geometry: 
     system = Geometry.GetGeometry()
@@ -43,7 +45,7 @@ if __name__ == '__main__':
     if cf.save:
         np.save(f'{cf.name}_X', X)
         np.save(f'{cf.name}_V', V)
-
+    
     cf.GetTime(start=False)
 
 

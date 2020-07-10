@@ -4,22 +4,12 @@ import Config as cf
 
 class Beam():
     def __init__(self):
-        self.nrays = cf.beam['nrays']
-        self.chunck = cf.beam['chunck']
+        self.nrays = cf.nrays
         self.x = cf.beam['x']
         self.y = cf.beam['y']
         self.z = cf.beam['z']
         self.cov = cf.beam['cov']
         
-    def PrepareData(self, X, V):
-        assert X.shape[1] == V.shape[1] == 3
-        assert X.shape[0] == V.shape[0]
-        n = X.shape[0] // self.chunck
-        cf.logger.info(f'Dividing the data into {n:,} pieces')
-        X = X[:n * self.chunck].reshape(n, self.chunck, 3)
-        V = V[:n * self.chunck].reshape(n, self.chunck, 3)
-        return X, V
-
     def GenerateRaysV(self, n):
         Vtype = cf.beam['Vtype']
         if Vtype == 'parallel':
