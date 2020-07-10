@@ -22,7 +22,6 @@ class Mirror(OpticalComponent):
         return X, V
 
 
-#class PlaneMirror(Mirror, OpticalComponent):
 class PlaneMirror(Mirror):
     def __init__(self, normal=np.array([[0., 0., -1.]]), R=20., name='PlaneMirror'):
         Mirror.__init__(self, name=name)
@@ -65,7 +64,6 @@ class PlaneMirror(Mirror):
         return X, V
 
 
-#class ParaMirror(Mirror, OpticalComponent):
 class ParaMirror(Mirror):
     def __init__(self, f=550., H=120., D=120., rough=False, name=None):
         Mirror.__init__(self, name=name)

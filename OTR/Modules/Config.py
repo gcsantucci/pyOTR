@@ -11,21 +11,9 @@ def Conv(deg):
 VERBOSE = 1  # Set to 1 for debugging info
 
 save = True
+inputs = 'data/pencil_{}initial.npy'
 name = 'output/pencil'  # name prefix used to create all outputs
 logfile = name + '.log'  # log output will be directed to this file and to screen
-
-beam = {
-    'PID': 22,  # PDG PID: 22 for photons and 2212 for proton beam
-    'Xtype': 'pencil',  # Create square grid, pencil beam or use testimage
-    'nrays': 1_000_000,
-    'chunck': 1_000,  # 0 if no division is to be made
-    'size': 25.,
-    'Vtype': 'parallel',
-    'x': 0.,
-    'y': 0.,
-    'z': -100.,
-    'cov': np.diag([10., 10., 0.])
-}
 
 light = {
     0: 'OTR',
