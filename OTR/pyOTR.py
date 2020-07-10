@@ -34,6 +34,9 @@ if __name__ == '__main__':
     X = np.load(cf.inputs.format('X'))
     V =	np.load(cf.inputs.format('V'))
 
+    if cf.chunck > 0:
+        X, V = PrepareData(X, V, chunck=cf.chunck)
+    
     # Get the optical components to be simulated:
     system = Geometry.GetGeometry()
 

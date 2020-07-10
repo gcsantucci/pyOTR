@@ -15,6 +15,8 @@ inputs = 'data/pencil_{}initial.npy'
 name = 'output/pencil'  # name prefix used to create all outputs
 logfile = name + '.log'  # log output will be directed to this file and to screen
 
+chunck = 1_000
+
 light = {
     0: 'OTR',
     1: 'F1',
